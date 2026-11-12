@@ -1,37 +1,42 @@
 <h1>Submit a talk</h1>
 
-<!-- TODO (lab 1): bind the form with [formRoot] and every control with [formField] -->
-<!-- TODO (lab 1): show each field's errors in <mat-error> with <app-field-errors> -->
-<form class="talk-form">
+<form class="talk-form" [formRoot]="talkForm">
   <mat-form-field>
     <mat-label>Title</mat-label>
-    <input matInput />
+    <input matInput [formField]="talkForm.title" />
+    @if (talkForm.title().pending()) {
+      <mat-spinner matSuffix diameter="20" />
+    }
+    <mat-error><app-field-errors [errors]="talkForm.title().errors()" /></mat-error>
   </mat-form-field>
 
   <mat-form-field>
     <mat-label>Abstract</mat-label>
-    <textarea matInput rows="5"></textarea>
-    <mat-hint align="end">{{ talk().abstract.length }} / 100+</mat-hint>
+    <textarea matInput rows="5" [formField]="talkForm.abstract"></textarea>
+    <mat-hint align="end">{{ talkForm.abstract().value().length }} / 100+</mat-hint>
+    <mat-error><app-field-errors [errors]="talkForm.abstract().errors()" /></mat-error>
   </mat-form-field>
 
   <div class="row">
     <mat-form-field>
       <mat-label>Format</mat-label>
-      <select matNativeControl>
+      <select matNativeControl [formField]="talkForm.format">
         <option value="lightning">Lightning talk</option>
         <option value="talk">Talk</option>
         <option value="workshop">Workshop</option>
       </select>
+      <mat-error><app-field-errors [errors]="talkForm.format().errors()" /></mat-error>
     </mat-form-field>
 
     <mat-form-field>
       <mat-label>Duration (minutes)</mat-label>
-      <input matInput type="number" />
+      <input matInput type="number" [formField]="talkForm.duration" />
+      <mat-error><app-field-errors [errors]="talkForm.duration().errors()" /></mat-error>
     </mat-form-field>
 
     <mat-form-field>
       <mat-label>Level</mat-label>
-      <select matNativeControl>
+      <select matNativeControl [formField]="talkForm.level">
         <option value="beginner">Beginner</option>
         <option value="intermediate">Intermediate</option>
         <option value="advanced">Advanced</option>
@@ -39,26 +44,28 @@
     </mat-form-field>
   </div>
 
-  <!-- Lab 2: <app-tag-input> for the tags -->
+  <h2>Tags</h2>
+  <app-tag-input [formField]="talkForm.tags" />
 
   <h2>Speakers</h2>
-  <!-- TODO (lab 1): iterate over the speakers field tree instead of the model -->
-  @for (speaker of talk().speakers; track $index; let i = $index) {
+  @for (speaker of talkForm.speakers; track speaker; let i = $index) {
     <fieldset class="speaker">
       <legend>Speaker {{ i + 1 }}</legend>
       <mat-form-field>
         <mat-label>Name</mat-label>
-        <input matInput />
+        <input matInput [formField]="speaker.name" />
+        <mat-error><app-field-errors [errors]="speaker.name().errors()" /></mat-error>
       </mat-form-field>
       <mat-form-field>
         <mat-label>Email</mat-label>
-        <input matInput type="email" />
+        <input matInput type="email" [formField]="speaker.email" />
+        <mat-error><app-field-errors [errors]="speaker.email().errors()" /></mat-error>
       </mat-form-field>
       <mat-form-field>
         <mat-label>Company</mat-label>
-        <input matInput />
+        <input matInput [formField]="speaker.company" />
       </mat-form-field>
-      @if (talk().speakers.length > 1) {
+      @if (talkForm.speakers().value().length > 1) {
         <button
           mat-icon-button
           type="button"
@@ -76,19 +83,38 @@
   </button>
 
   <h2>Travel</h2>
-  <mat-checkbox>I need travel support</mat-checkbox>
-  <!-- TODO (lab 1): show this field only when it is not hidden -->
-  <mat-form-field>
-    <mat-label>Travelling from</mat-label>
-    <input matInput />
-  </mat-form-field>
+  <mat-checkbox [formField]="talkForm.travel.needed">I need travel support</mat-checkbox>
+  @if (!talkForm.travel.from().hidden()) {
+    <mat-form-field>
+      <mat-label>Travelling from</mat-label>
+      <input matInput [formField]="talkForm.travel.from" />
+      <mat-error><app-field-errors [errors]="talkForm.travel.from().errors()" /></mat-error>
+    </mat-form-field>
+  }
 
-  <mat-checkbox>I accept the code of conduct</mat-checkbox>
+  <mat-checkbox [formField]="talkForm.codeOfConduct">I accept the code of conduct</mat-checkbox>
+  @if (talkForm.codeOfConduct().touched() && talkForm.codeOfConduct().invalid()) {
+    <app-field-errors class="error" [errors]="talkForm.codeOfConduct().errors()" />
+  }
 
   <div class="actions">
-    <!-- TODO (lab 1): disable the button while the form is invalid, show how many problems are left -->
-    <!-- Lab 2: submit the form -->
-    <button mat-flat-button type="button">Submit</button>
+    <button mat-flat-button type="submit" [disabled]="talkForm().submitting()">
+      @if (talkForm().submitting()) {
+        Submitting...
+      } @else {
+        Submit
+      }
+    </button>
+    <span class="status">
+      @if (talkForm().pending()) {
+        Checking...
+      } @else if (talkForm().invalid()) {
+        {{ talkForm().errorSummary().length }}
+        {{ talkForm().errorSummary().length === 1 ? 'problem' : 'problems' }} left
+      } @else {
+        Ready to submit
+      }
+    </span>
   </div>
 </form>
 

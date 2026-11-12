@@ -1,83 +1,78 @@
-import { Component, effect, inject } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { Component, inject, linkedSignal } from '@angular/core';
 import {
-  FormArray,
-  FormControl,
-  NonNullableFormBuilder,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
+  applyEach,
+  email,
+  form,
+  FormField,
+  FormRoot,
+  maxLength,
+  pattern,
+  required,
+  schema,
+} from '@angular/forms/signals';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { map } from 'rxjs';
+import { FieldErrors } from '../controls/field-errors/field-errors';
+import { SpeakerProfile } from '../models/speaker-profile';
 import { ProfileStore } from '../stores/profile-store';
+
+const https = /^https:\/\//;
+
+const profileSchema = schema<SpeakerProfile>((profile) => {
+  required(profile.name, { message: 'Enter your name.' });
+  required(profile.email, { message: 'Enter an email address.' });
+  email(profile.email, { message: 'Enter a valid email address.' });
+  maxLength(profile.bio, 280, { message: 'Keep the bio under 280 characters.' });
+  pattern(profile.website, https, { message: 'Use an https:// address.' });
+  applyEach(profile.links, (link) => {
+    required(link, { message: 'Enter a link or remove it.' });
+    pattern(link, https, { message: 'Use an https:// address.' });
+  });
+});
 
 @Component({
   selector: 'app-profile-editor',
-  imports: [ReactiveFormsModule, MatButtonModule, MatCheckboxModule, MatIconModule, MatInputModule],
+  imports: [
+    FormField,
+    FormRoot,
+    MatButtonModule,
+    MatCheckboxModule,
+    MatIconModule,
+    MatInputModule,
+    FieldErrors,
+  ],
   templateUrl: './profile-editor.html',
   styleUrl: './profile-editor.scss',
 })
 export class ProfileEditor {
   private readonly store = inject(ProfileStore);
   private readonly snackBar = inject(MatSnackBar);
-  private readonly fb = inject(NonNullableFormBuilder);
 
-  protected readonly profileForm = this.fb.group({
-    name: ['', Validators.required],
-    email: ['', [Validators.required, Validators.email]],
-    bio: ['', Validators.maxLength(280)],
-    website: ['', Validators.pattern(/^https:\/\//)],
-    links: this.fb.array<FormControl<string>>([]),
-    newsletter: false,
+  // A local draft: starts from the stored profile and follows it when the store changes
+  protected readonly draft = linkedSignal(() => this.store.profile());
+
+  protected readonly profileForm = form(this.draft, profileSchema, {
+    submission: {
+      action: async (profileForm) => {
+        await this.store.save(profileForm().value());
+        profileForm().reset();
+        this.snackBar.open('Profile saved.', 'OK', { duration: 3000 });
+        return null;
+      },
+    },
   });
 
-  protected readonly bioLength = toSignal(
-    this.profileForm.controls.bio.valueChanges.pipe(map((bio) => bio.length)),
-    { initialValue: 0 },
-  );
-
-  protected saving = false;
-
-  constructor() {
-    // Copy the stored profile into the form whenever the store changes
-    effect(() => {
-      const profile = this.store.profile();
-      this.links.clear();
-      for (const link of profile.links) {
-        this.links.push(this.linkControl(link));
-      }
-      this.profileForm.reset(profile);
-    });
-  }
-
-  protected get links(): FormArray<FormControl<string>> {
-    return this.profileForm.controls.links;
-  }
-
   protected addLink(): void {
-    this.links.push(this.linkControl(''));
+    this.draft.update((profile) => ({ ...profile, links: [...profile.links, ''] }));
   }
 
   protected removeLink(index: number): void {
-    this.links.removeAt(index);
-  }
-
-  protected async save(): Promise<void> {
-    if (this.profileForm.invalid) {
-      this.profileForm.markAllAsTouched();
-      return;
-    }
-    this.saving = true;
-    await this.store.save(this.profileForm.getRawValue());
-    this.saving = false;
-    this.snackBar.open('Profile saved.', 'OK', { duration: 3000 });
-  }
-
-  private linkControl(link: string): FormControl<string> {
-    return this.fb.control(link, [Validators.required, Validators.pattern(/^https:\/\//)]);
+    this.draft.update((profile) => ({
+      ...profile,
+      links: profile.links.filter((_, i) => i !== index),
+    }));
   }
 }

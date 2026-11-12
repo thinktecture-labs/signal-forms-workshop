@@ -1,60 +1,58 @@
 <h1>Speaker profile</h1>
 
-<form class="profile-form" [formGroup]="profileForm" (ngSubmit)="save()">
+<form class="profile-form" [formRoot]="profileForm">
   <mat-form-field>
     <mat-label>Name</mat-label>
-    <input matInput formControlName="name" />
-    <mat-error>Enter your name.</mat-error>
+    <input matInput [formField]="profileForm.name" />
+    <mat-error><app-field-errors [errors]="profileForm.name().errors()" /></mat-error>
   </mat-form-field>
 
   <mat-form-field>
     <mat-label>Email</mat-label>
-    <input matInput type="email" formControlName="email" />
-    @if (profileForm.controls.email.hasError('required')) {
-      <mat-error>Enter an email address.</mat-error>
-    } @else {
-      <mat-error>Enter a valid email address.</mat-error>
-    }
+    <input matInput type="email" [formField]="profileForm.email" />
+    <mat-error><app-field-errors [errors]="profileForm.email().errors()" /></mat-error>
   </mat-form-field>
 
   <mat-form-field>
     <mat-label>Bio</mat-label>
-    <textarea matInput rows="4" formControlName="bio"></textarea>
-    <mat-hint align="end">{{ bioLength() }} / 280</mat-hint>
-    <mat-error>Keep the bio under 280 characters.</mat-error>
+    <textarea matInput rows="4" [formField]="profileForm.bio"></textarea>
+    <mat-hint align="end">{{ profileForm.bio().value().length }} / 280</mat-hint>
+    <mat-error><app-field-errors [errors]="profileForm.bio().errors()" /></mat-error>
   </mat-form-field>
 
   <mat-form-field>
     <mat-label>Website</mat-label>
-    <input matInput formControlName="website" />
-    <mat-error>Use an https:// address.</mat-error>
+    <input matInput [formField]="profileForm.website" />
+    <mat-error><app-field-errors [errors]="profileForm.website().errors()" /></mat-error>
   </mat-form-field>
 
   <h2>Links</h2>
-  <div formArrayName="links">
-    @for (link of links.controls; track link; let i = $index) {
-      <div class="link">
-        <mat-form-field>
-          <mat-label>Link {{ i + 1 }}</mat-label>
-          <input matInput [formControlName]="i" />
-          <mat-error>Use an https:// address.</mat-error>
-        </mat-form-field>
-        <button mat-icon-button type="button" aria-label="Remove link" (click)="removeLink(i)">
-          <mat-icon>delete</mat-icon>
-        </button>
-      </div>
-    }
-  </div>
+  @for (link of profileForm.links; track link; let i = $index) {
+    <div class="link">
+      <mat-form-field>
+        <mat-label>Link {{ i + 1 }}</mat-label>
+        <input matInput [formField]="link" />
+        <mat-error><app-field-errors [errors]="link().errors()" /></mat-error>
+      </mat-form-field>
+      <button mat-icon-button type="button" aria-label="Remove link" (click)="removeLink(i)">
+        <mat-icon>delete</mat-icon>
+      </button>
+    </div>
+  }
   <button mat-stroked-button type="button" (click)="addLink()">
     <mat-icon>add_link</mat-icon>
     Add link
   </button>
 
-  <mat-checkbox formControlName="newsletter">Send me the speaker newsletter</mat-checkbox>
+  <mat-checkbox [formField]="profileForm.newsletter">Send me the speaker newsletter</mat-checkbox>
 
   <div class="actions">
-    <button mat-flat-button type="submit" [disabled]="saving || profileForm.pristine">
-      {{ saving ? 'Saving...' : 'Save' }}
+    <button
+      mat-flat-button
+      type="submit"
+      [disabled]="profileForm().submitting() || !profileForm().dirty()"
+    >
+      {{ profileForm().submitting() ? 'Saving...' : 'Save' }}
     </button>
   </div>
 </form>

@@ -1,6 +1,6 @@
-<div class="tags">
-  @for (tag of tags(); track tag) {
-    <mat-chip>
+<div class="tags" [class.invalid]="touched() && invalid()">
+  @for (tag of value(); track tag) {
+    <mat-chip [disabled]="disabled()">
       {{ tag }}
       <button matChipRemove [attr.aria-label]="'Remove ' + tag" (click)="remove(tag)">
         <mat-icon>cancel</mat-icon>
@@ -11,6 +11,13 @@
     #tagField
     placeholder="Add a tag and press Enter"
     aria-label="New tag"
+    [disabled]="disabled()"
     (keydown.enter)="$event.preventDefault(); add(tagField)"
+    (blur)="touch.emit()"
   />
 </div>
+@if (touched() && invalid()) {
+  @for (error of errors(); track $index) {
+    <div class="error">{{ error.message }}</div>
+  }
+}
