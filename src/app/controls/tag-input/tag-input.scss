@@ -1,0 +1,33 @@
+:host {
+  display: block;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border: 1px solid var(--mat-sys-outline);
+  border-radius: 4px;
+
+  &.invalid {
+    border-color: var(--mat-sys-error);
+  }
+
+  input {
+    flex: 1;
+    min-width: 160px;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+  }
+}
+
+.error {
+  margin: 4px 16px 0;
+  color: var(--mat-sys-error);
+  font: var(--mat-sys-body-small);
+}

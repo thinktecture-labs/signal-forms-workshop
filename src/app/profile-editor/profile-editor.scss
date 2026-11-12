@@ -1,0 +1,29 @@
+:host {
+  display: block;
+  max-width: 640px;
+}
+
+.profile-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+h2 {
+  margin: 16px 0 4px;
+  font: var(--mat-sys-title-medium);
+}
+
+.link {
+  display: flex;
+  align-items: start;
+  gap: 8px;
+
+  mat-form-field {
+    flex: 1;
+  }
+}
+
+.actions {
+  margin-top: 16px;
+}

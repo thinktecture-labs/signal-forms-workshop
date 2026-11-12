@@ -1,0 +1,57 @@
+:host {
+  display: block;
+  max-width: 880px;
+}
+
+.talk-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+h2 {
+  margin: 16px 0 4px;
+  font: var(--mat-sys-title-medium);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.speaker {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr auto;
+  align-items: start;
+  gap: 16px;
+  margin: 0 0 8px;
+  padding: 16px 16px 0;
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 8px;
+
+  legend {
+    padding: 0 4px;
+    font: var(--mat-sys-label-large);
+  }
+}
+
+.error {
+  color: var(--mat-sys-error);
+  font: var(--mat-sys-body-small);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.status {
+  color: var(--mat-sys-on-surface-variant);
+}
+
+details {
+  margin-top: 32px;
+}

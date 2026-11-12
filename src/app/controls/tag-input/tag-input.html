@@ -1,0 +1,16 @@
+<div class="tags">
+  @for (tag of tags(); track tag) {
+    <mat-chip>
+      {{ tag }}
+      <button matChipRemove [attr.aria-label]="'Remove ' + tag" (click)="remove(tag)">
+        <mat-icon>cancel</mat-icon>
+      </button>
+    </mat-chip>
+  }
+  <input
+    #tagField
+    placeholder="Add a tag and press Enter"
+    aria-label="New tag"
+    (keydown.enter)="$event.preventDefault(); add(tagField)"
+  />
+</div>

@@ -1,0 +1,40 @@
+<h1>Speaker survey</h1>
+
+@if (questions.isLoading()) {
+  <p>Loading...</p>
+}
+
+<form class="survey-form" [formRoot]="surveyForm">
+  @for (question of questions.value(); track question.id) {
+    @let answer = surveyForm[question.id];
+    @if (!answer().hidden()) {
+      <mat-form-field>
+        <mat-label>{{ question.label }}</mat-label>
+        @switch (question.type) {
+          @case ('select') {
+            <select matNativeControl [formField]="answer">
+              <option value="">Choose...</option>
+              @for (option of question.options; track option) {
+                <option [value]="option">{{ option }}</option>
+              }
+            </select>
+          }
+          @case ('textarea') {
+            <textarea matInput rows="3" [formField]="answer"></textarea>
+          }
+          @default {
+            <input matInput [formField]="answer" />
+          }
+        }
+        @if (question.maxLength) {
+          <mat-hint align="end">{{ answer().value().length }} / {{ question.maxLength }}</mat-hint>
+        }
+        <mat-error><app-field-errors [errors]="answer().errors()" /></mat-error>
+      </mat-form-field>
+    }
+  }
+
+  <div class="actions">
+    <button mat-flat-button type="submit" [disabled]="surveyForm().submitting()">Send</button>
+  </div>
+</form>

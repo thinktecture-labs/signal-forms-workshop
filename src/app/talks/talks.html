@@ -1,0 +1,33 @@
+<div class="header">
+  <h1>Submitted talks</h1>
+  <a mat-flat-button routerLink="/submit">Submit a talk</a>
+</div>
+
+@if (store.loading()) {
+  <p>Loading...</p>
+}
+
+@for (talk of store.talks(); track talk.id) {
+  <mat-card appearance="outlined">
+    <mat-card-header>
+      <mat-card-title>{{ talk.title }}</mat-card-title>
+      <mat-card-subtitle>
+        {{ talk.format }} · {{ talk.duration }} min · {{ talk.level }} ·
+        {{ talk.submittedAt | date: 'mediumDate' }}
+      </mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <p>{{ talk.abstract }}</p>
+      <p class="speakers">
+        @for (speaker of talk.speakers; track speaker.email; let last = $last) {
+          {{ speaker.name }}{{ last ? '' : ', ' }}
+        }
+      </p>
+      <mat-chip-set>
+        @for (tag of talk.tags; track tag) {
+          <mat-chip>{{ tag }}</mat-chip>
+        }
+      </mat-chip-set>
+    </mat-card-content>
+  </mat-card>
+}

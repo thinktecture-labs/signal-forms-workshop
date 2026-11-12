@@ -1,0 +1,24 @@
+<mat-toolbar>
+  <span class="brand">Call for Papers</span>
+  <nav>
+    <a mat-button routerLink="/talks" routerLinkActive="active">
+      <mat-icon>list</mat-icon>
+      Talks
+    </a>
+    <a mat-button routerLink="/submit" routerLinkActive="active">
+      <mat-icon>edit_note</mat-icon>
+      Submit
+    </a>
+    <a mat-button routerLink="/survey" routerLinkActive="active">
+      <mat-icon>quiz</mat-icon>
+      Survey
+    </a>
+    <a mat-button routerLink="/profile" routerLinkActive="active">
+      <mat-icon>person</mat-icon>
+      Profile
+    </a>
+  </nav>
+</mat-toolbar>
+<main>
+  <router-outlet />
+</main>

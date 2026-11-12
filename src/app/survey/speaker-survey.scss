@@ -1,0 +1,14 @@
+:host {
+  display: block;
+  max-width: 640px;
+}
+
+.survey-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.actions {
+  margin-top: 16px;
+}

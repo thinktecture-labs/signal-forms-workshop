@@ -1,0 +1,17 @@
+mat-toolbar {
+  gap: 24px;
+  background: var(--mat-sys-primary-container);
+  color: var(--mat-sys-on-primary-container);
+}
+
+.brand {
+  font: var(--mat-sys-title-large);
+}
+
+.active {
+  background: var(--mat-sys-surface-container-highest);
+}
+
+main {
+  padding: 24px;
+}

@@ -1,0 +1,16 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 880px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.speakers {
+  color: var(--mat-sys-on-surface-variant);
+}
